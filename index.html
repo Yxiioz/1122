@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>味全龍 #25 張政禹 | 專屬 AI 聊天互動知識庫</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Noto Sans TC & Teko 運動球衣風格字體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Teko:wght@600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Marked.js for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dragons: {
+              red: '#C52227',
+              darkRed: '#8B0000',
+              crimson: '#9B111E',
+              gold: '#D4AF37',
+              goldHover: '#F59E0B',
+              dark: '#121214',
+              surface: '#18181B',
+              surfaceHover: '#242429',
+              border: '#2E2E35'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+            jersey: ['"Teko"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* 自訂滾動條 */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #121214; }
+    ::-webkit-scrollbar-thumb { background: #2E2E35; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #C52227; }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* 訊息進場動畫 */
+    @keyframes popIn {
+      0% { opacity: 0; transform: translateY(8px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .msg-bubble-enter {
+      animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* 張政禹人物待機動畫 */
+    @keyframes playerBreathing {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+    @keyframes ballPlay {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-7px) rotate(35deg); }
+    }
+    @keyframes eyeBlink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      96% { transform: scaleY(0.1); }
+    }
+    .player-anim-body {
+      animation: playerBreathing 3.2s ease-in-out infinite;
+      transform-origin: bottom center;
+    }
+    .player-anim-ball {
+      animation: ballPlay 2.4s ease-in-out infinite;
+      transform-origin: center;
+    }
+    .player-eye {
+      animation: eyeBlink 4.2s infinite;
+      transform-origin: 50% 50%;
+    }
+    .player-active-boost {
+      animation: playerBreathing 0.9s ease-in-out infinite !important;
+    }
+
+    .real-player-photo {
+      filter: saturate(0.92) contrast(1.04);
+      object-position: center 20%;
+      transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1), filter 420ms ease;
+    }
+    .real-player-card:hover .real-player-photo {
+      transform: scale(1.035);
+      filter: saturate(1.08) contrast(1.06);
+    }
+    .team-grid {
+      background-image:
+        linear-gradient(rgba(197,34,39,0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(197,34,39,0.055) 1px, transparent 1px);
+      background-size: 18px 18px;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    :focus-visible {
+      outline: 3px solid #D4AF37;
+      outline-offset: 3px;
+    }
+    .skip-link {
+      position: fixed;
+      left: 1rem;
+      top: -4rem;
+      z-index: 100;
+      transition: top 160ms ease;
+    }
+    .skip-link:focus { top: 1rem; }
+    @media (max-width: 640px) {
+      body { min-height: 100dvh; }
+      #chatScrollArea { padding: 0.75rem; }
+      #welcomeBanner { padding: 0.875rem; }
+      #welcomeBanner .quick-btn { width: 100%; justify-content: flex-start; }
+      #playerSidebar { width: min(86vw, 19rem); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Markdown 樣式微調 */
+    .markdown-body p { margin-bottom: 0.5rem; }
+    .markdown-body p:last-child { margin-bottom: 0; }
+    .markdown-body ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.5rem; }
+    .markdown-body ol { list-style-type: decimal; padding-left: 1.25rem; margin-bottom: 0.5rem; }
+    .markdown-body strong { color: #F59E0B; font-weight: 700; }
+  </style>
+</head>
+<body class="bg-dragons-dark text-slate-100 font-sans h-full flex flex-col antialiased selection:bg-dragons-red selection:text-white">
+  <a href="#mainChat" class="skip-link rounded-lg bg-dragons-gold px-4 py-2 text-sm font-bold text-dragons-dark shadow-xl">跳到主要對話區</a>
+  <div id="voiceStatus" class="sr-only" role="status" aria-live="polite"></div>
+
+  <!-- ==================== 頂部 HEADER ==================== -->
+  <header class="h-16 bg-dragons-surface/95 border-b border-dragons-red/50 backdrop-blur-md px-4 flex items-center justify-between shrink-0 z-30 sticky top-0 shadow-[0_4px_24px_rgba(197,34,39,0.08)]">
+    <div class="flex items-center space-x-3">
+      <!-- 手機版開關側邊欄按鈕 -->
+      <button id="toggleSidebarMobile" class="md:hidden p-2 rounded-lg bg-dragons-dark border border-dragons-border text-slate-300 hover:text-white" aria-controls="playerSidebar" aria-expanded="false" aria-label="開啟選手與知識庫面板">
+        <i class="fa-solid fa-bars-staggered text-sm"></i>
+      </button>
+
+      <!-- 味全龍 25 號頭貼標記 -->
+      <div class="relative flex items-center justify-center">
+        <div class="w-10 h-10 rounded-full border-2 border-dragons-gold overflow-hidden shadow-md shadow-red-950/40 bg-dragons-dark">
+          <img src="張.jpg" alt="張政禹" class="w-full h-full object-cover object-[center_18%]">
+        </button>
+        <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-dragons-surface rounded-full shadow" title="知識庫連線正常"></span>
+      </button>
+
+      <!-- 選手標題與名牌 -->
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="text-base font-bold text-white tracking-wide">張政禹</span>
+          <span class="text-xs px-2 py-0.5 rounded bg-dragons-red/20 text-red-400 border border-dragons-red/40 font-semibold font-mono">#25</span>
+          <span class="hidden sm:inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-amber-500/10 text-dragons-gold border border-amber-500/30">
+            <i class="fa-solid fa-trophy text-[10px]"></i> 2024 世界12強・2026 中職冠軍
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+          <span>味全龍主力內野游擊手</span>
+          <span class="text-slate-600">•</span>
+          <span class="text-emerald-400 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            ChatPDF API 已連線
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <!-- 右側功能按鈕 -->
+    <div class="flex items-center space-x-2">
+      <button id="clearChatBtn" class="px-2.5 py-1.5 rounded-lg bg-dragons-dark hover:bg-dragons-surfaceHover border border-dragons-border text-slate-400 hover:text-white text-xs transition flex items-center gap-1.5" title="清空對話">
+        <i class="fa-solid fa-rotate-right text-xs"></i>
+        <span class="hidden sm:inline">新對話</span>
+      </button>
+
+      <button id="openConfigBtn" class="px-3 py-1.5 rounded-lg bg-dragons-red hover:bg-dragons-crimson border border-red-500/30 text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5">
+        <i class="fa-solid fa-database text-dragons-gold"></i>
+        <span>PDF 來源設定</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== 主舞台 (左側人物面板 + 右側聊天流) ==================== -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- ─── 左側面板：張政禹虛擬球員舞台與檔案 ─── -->
+    <aside id="playerSidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 md:w-84 bg-dragons-surface border-r border-dragons-border p-4 flex flex-col justify-between transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out shrink-0">
+      
+      <div class="space-y-3.5 overflow-y-auto no-scrollbar">
+        <!-- 手機版關閉按鈕 -->
+        <div class="flex md:hidden justify-between items-center pb-2 border-b border-dragons-border">
+          <span class="text-xs font-bold text-slate-300">選手看板與知識庫</span>
+          <button id="closeSidebarMobile" class="text-slate-400 hover:text-white p-1">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- ─── 張政禹照片互動舞台 ─── -->
+        <div class="real-player-card bg-gradient-to-b from-[#211113] via-dragons-surface to-dragons-dark p-3 rounded-2xl border border-dragons-red/50 shadow-[0_16px_36px_rgba(0,0,0,0.35)] relative text-center select-none overflow-hidden">
+          <div class="absolute inset-0 team-grid opacity-40 pointer-events-none"></div>
+          <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-dragons-red to-transparent"></div>
+
+          <!-- 互動即時台詞氣泡 -->
+          <div id="playerBubble" class="relative inline-block bg-dragons-surfaceHover border border-dragons-gold/50 text-slate-100 text-xs px-3.5 py-1.5 rounded-full shadow-md mb-2 max-w-[95%] transition-all duration-300">
+            <span id="playerBubbleText" class="font-medium text-amber-200">只要撲下去，球就是我們的！🔥</span>
+            <div class="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-dragons-gold/50"></div>
+          </div>
+
+          <!-- 張政禹球場照片（可直接替換為球員/味全龍照片） -->
+          <button id="playerPhotoBox" type="button" onclick="interactWithPlayer()" class="relative cursor-pointer mx-auto w-52 h-64 rounded-2xl overflow-hidden border border-white/10 shadow-2xl transition-transform active:scale-[0.98]" title="點擊跟政禹互動" aria-label="跟張政禹互動並聽隨機球員台詞">
+            <img src="張.jpg" alt="張政禹球場照片" class="real-player-photo w-full h-full object-cover">
+            <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-dragons-dark to-transparent"></div>
+            <div class="absolute left-3 bottom-3 flex items-end gap-2">
+              <span class="font-jersey text-5xl leading-none text-white drop-shadow-lg">25</span>
+              <span class="mb-1 text-[10px] font-bold tracking-[0.2em] text-dragons-gold">DRAGONS</span>
+            </div>
+          </button>
+
+          <div class="mt-2 flex items-center justify-center gap-1.5">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span class="text-xs font-bold text-dragons-gold">#25 張政禹 球星寫真</span>
+            <span class="text-[10px] text-slate-400 font-mono">（點擊擊掌互動）</span>
+          </div>
+        </div>
+
+        <!-- 選手卡片檔案 -->
+        <div class="bg-gradient-to-b from-dragons-dark to-dragons-surface p-3.5 rounded-2xl border border-dragons-border relative overflow-hidden">
+          <div class="absolute -right-3 -bottom-4 font-jersey text-8xl text-white/5 select-none font-bold">25</div>
+          <div class="flex items-center space-x-3 mb-2.5">
+            <div class="w-10 h-10 rounded-xl bg-dragons-red/20 border border-dragons-red flex items-center justify-center text-dragons-gold text-xl font-jersey font-bold">
+              #25
+            </div>
+            <div>
+              <h2 class="text-sm font-bold text-white">張政禹 (Cheng-Yu Chang)</h2>
+              <p class="text-[11px] text-dragons-gold font-medium">味全龍內野主將</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-1.5 text-xs">
+            <div class="bg-dragons-surface/80 p-1.5 rounded-lg border border-dragons-border/60">
+              <span class="text-slate-400 block text-[9px]">守備位置</span>
+              <span class="text-slate-200 font-semibold text-[11px]">游擊 / 二壘 / 三壘</span>
+            </div>
+            <div class="bg-dragons-surface/80 p-1.5 rounded-lg border border-dragons-border/60">
+              <span class="text-slate-400 block text-[9px]">投打習慣</span>
+              <span class="text-slate-200 font-semibold text-[11px]">右投左打 (R/L)</span>
+            </div>
+            <div class="bg-dragons-surface/80 p-1.5 rounded-lg border border-dragons-border/60">
+              <span class="text-slate-400 block text-[9px]">選秀經歷</span>
+              <span class="text-slate-200 font-semibold text-[11px]">2019 第11指名逆襲</span>
+            </div>
+            <div class="bg-dragons-surface/80 p-1.5 rounded-lg border border-dragons-border/60">
+              <span class="text-amber-400 font-semibold text-[11px]">2024 世界12強冠軍</span>
+              <span class="text-dragons-gold font-semibold text-[11px] block">2026 中職年度總冠軍</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 選手精神標語 -->
+        <div class="bg-dragons-red/10 border-l-4 border-dragons-red p-2.5 rounded-r-xl">
+          <p class="text-[11px] text-red-200 font-medium italic">
+            「順位不代表一切，只要穿上球衣站在場上，我就全力撲下每一顆球！」
+          </p>
+          <span class="text-[9px] text-red-400/80 block mt-0.5 text-right">— 張政禹 座右銘</span>
+        </div>
+
+        <!-- 連線 PDF 知識庫狀態 -->
+        <div class="bg-dragons-dark/80 rounded-xl p-2.5 border border-dragons-border text-xs space-y-1.5">
+          <div class="flex items-center justify-between text-slate-300 font-semibold">
+            <span class="flex items-center gap-1.5 text-xs">
+              <i class="fa-regular fa-file-pdf text-dragons-red"></i> 連線 PDF 知識庫
+            </span>
+            <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">已掛載</span>
+          </div>
+
+          <div class="space-y-0.5">
+            <div class="text-[10px] text-slate-400">目前 Source ID：</div>
+            <div id="sidebarSourceIdDisplay" class="font-mono text-[9px] bg-black/40 px-2 py-1 rounded border border-slate-800 text-amber-300 break-all select-all">
+              cha_AAuyTuEJIvpt0xbrDACLf
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-dragons-border text-[10px] text-slate-500 flex items-center justify-between">
+        <span>味全龍 AI 粉絲互動端</span>
+        <span class="font-mono text-slate-600">v3.0 Photo Edition</span>
+      </div>
+    </aside>
+
+    <!-- 手機側邊欄遮罩 -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden"></div>
+
+    <!-- ─── 中央主舞台：對話歷程與提問 ─── -->
+    <main id="mainChat" class="flex-1 flex flex-col min-w-0 bg-dragons-dark relative" aria-label="張政禹 AI 聊天主要區域">
+
+      <!-- 訊息列表滾動區 -->
+      <div id="chatScrollArea" class="flex-1 overflow-y-auto px-4 py-6 space-y-5 max-w-4xl w-full mx-auto" role="log" aria-live="polite" aria-relevant="additions" aria-label="對話紀錄">
+
+        <!-- 歡迎橫幅卡片 -->
+        <div id="welcomeBanner" class="bg-gradient-to-r from-dragons-surface via-dragons-surfaceHover to-dragons-surface border border-dragons-border rounded-2xl p-5 shadow-lg relative overflow-hidden">
+          <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-dragons-red/10 to-transparent pointer-events-none"></div>
+          
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl border border-dragons-red overflow-hidden shrink-0 shadow-inner bg-dragons-dark">
+              <img src="張.jpg" alt="張政禹" class="w-full h-full object-cover object-[center_18%]">
+            </div>
+            <div class="space-y-2 flex-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-base font-bold text-white">哈囉！我是味全龍 25 號張政禹 👋</h3>
+                <span class="text-xs bg-dragons-red/30 text-red-300 px-2 py-0.5 rounded-full border border-dragons-red/50">已連線專屬 PDF</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                很高興在線上跟大家見面！有關我在**味全龍的打拼經歷、內野守備與撲接心得、2024 世界12強奪冠回憶、2026 中職年度總冠軍封王，以及生涯攻守數據**，都歡迎在下方提問！我會根據專屬知識庫直接回覆你喔！🔥
+              </p>
+
+              <!-- 快捷發問推薦標籤 -->
+              <div class="pt-2">
+                <span class="text-[11px] text-slate-400 block mb-2 font-medium">
+                  <i class="fa-solid fa-wand-magic-sparkles text-dragons-gold mr-1"></i>熱門提問推薦：
+                </span>
+                <div class="flex flex-wrap gap-2">
+                  <button onclick="sendQuickPrompt('聊聊你在 2024 年世界 12 強奪冠的心得與三壘/游擊守備表現！')" class="quick-btn text-xs bg-dragons-dark hover:bg-dragons-red hover:text-white text-slate-300 px-3 py-1.5 rounded-xl border border-dragons-border transition duration-150 flex items-center gap-1.5 shadow-sm">
+                    🏆 2024 12強奪冠心得與守備
+                  </button>
+                  <button onclick="sendQuickPrompt('聊聊味全龍在 2026 年奪得中職年度總冠軍的賽季經歷，以及台灣大賽第六戰奪冠的心情！')" class="quick-btn text-xs bg-dragons-dark hover:bg-dragons-red hover:text-white text-slate-300 px-3 py-1.5 rounded-xl border border-dragons-border transition duration-150 flex items-center gap-1.5 shadow-sm">
+                    🐉 2026 中職總冠軍回顧
+                  </button>
+                  <button onclick="sendQuickPrompt('從高中選秀落選到味全龍第11指名，你是如何一路堅持上先發的？')" class="quick-btn text-xs bg-dragons-dark hover:bg-dragons-red hover:text-white text-slate-300 px-3 py-1.5 rounded-xl border border-dragons-border transition duration-150 flex items-center gap-1.5 shadow-sm">
+                    🔥 第11指名逆襲心態
+                  </button>
+                  <button onclick="sendQuickPrompt('在游擊防區做出極限飛撲美技，最重要的心理與身體準備是什麼？')" class="quick-btn text-xs bg-dragons-dark hover:bg-dragons-red hover:text-white text-slate-300 px-3 py-1.5 rounded-xl border border-dragons-border transition duration-150 flex items-center gap-1.5 shadow-sm">
+                    🛡️ 游擊守備撲接要領
+                  </button>
+                  <button onclick="sendQuickPrompt('你在味全龍隊上跟哪位隊友默契最好？私底下大家感情如何？')" class="quick-btn text-xs bg-dragons-dark hover:bg-dragons-red hover:text-white text-slate-300 px-3 py-1.5 rounded-xl border border-dragons-border transition duration-150 flex items-center gap-1.5 shadow-sm">
+                    🐉 龍隊兄弟情誼與默契
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 訊息掛載節點 -->
+        <div id="messagesContainer" class="space-y-4"></div>
+
+        <!-- 打字中/檢索中動畫效果 -->
+        <div id="typingIndicator" class="hidden items-start space-x-3 msg-bubble-enter">
+          <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow border border-dragons-gold">
+            <img src="張.jpg" alt="張政禹" class="w-full h-full object-cover object-[center_18%]">
+          </div>
+          <div class="bg-dragons-surface border border-dragons-border px-4 py-3 rounded-2xl rounded-tl-sm flex items-center space-x-2 text-xs text-slate-400 shadow-md">
+            <div class="flex space-x-1">
+              <span class="w-2 h-2 rounded-full bg-dragons-red animate-bounce" style="animation-delay: 0s"></span>
+              <span class="w-2 h-2 rounded-full bg-dragons-red animate-bounce" style="animation-delay: 0.15s"></span>
+              <span class="w-2 h-2 rounded-full bg-dragons-red animate-bounce" style="animation-delay: 0.3s"></span>
+            </div>
+            <span class="text-slate-300">政禹正在翻閱 PDF 知識庫並整理回覆...</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── 底部操作與輸入欄 ─── -->
+      <div class="p-3 sm:p-4 bg-dragons-surface/95 border-t border-dragons-border backdrop-blur shrink-0">
+        <div class="max-w-4xl mx-auto space-y-2">
+          
+          <form id="chatForm" class="flex items-end gap-2 bg-dragons-dark border border-dragons-border focus-within:border-dragons-red rounded-2xl p-2 transition-all shadow-inner">
+            <label for="chatInput" class="sr-only">輸入要問張政禹的問題</label>
+            <textarea
+              id="chatInput"
+              rows="1"
+              placeholder="想問政禹什麼？輸入問題（Enter 送出，Shift + Enter 換行）..."
+              class="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none resize-none px-3 py-1.5 max-h-36 leading-relaxed"
+            ></textarea>
+
+            <button
+              type="button"
+              id="voiceInputBtn"
+              class="h-10 w-10 shrink-0 bg-dragons-surfaceHover border border-dragons-border hover:border-dragons-gold/70 text-slate-300 rounded-xl flex items-center justify-center transition shadow-md"
+              title="使用語音輸入"
+              aria-label="使用語音輸入問題"
+              aria-pressed="false"
+            >
+              <i class="fa-solid fa-microphone text-sm"></i>
+            </button>
+
+            <button
+              type="submit"
+              id="sendBtn"
+              class="h-10 w-10 shrink-0 bg-gradient-to-r from-dragons-red to-dragons-crimson hover:brightness-110 active:scale-95 text-white rounded-xl flex items-center justify-center transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              title="發送提問"
+              aria-label="發送提問"
+            >
+              <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+          </form>
+
+          <div class="flex items-center justify-between text-[11px] text-slate-500 px-1">
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-halved text-dragons-gold"></i>
+              由 ChatPDF API 驅動 · 數據以文件檢索出處為準
+            </span>
+            <span class="hidden sm:inline">背號 #25 味全龍主力游擊手</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== API 參數設定 MODAL ==================== -->
+  <div id="configModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-dragons-surface border border-dragons-border rounded-2xl max-w-lg w-full p-6 shadow-2xl relative overflow-hidden">
+      <button id="closeConfigBtn" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="flex items-center space-x-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-dragons-red/20 border border-dragons-red/50 flex items-center justify-center text-dragons-gold text-lg">
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-white">ChatPDF API 知識庫參數</h2>
+          <p class="text-xs text-slate-400">已預載您的 API Key 與專屬張政禹 PDF Source ID</p>
+        </div>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">ChatPDF Secret API Key</label>
+          <div class="relative">
+            <input
+              type="password"
+              id="inputApiKey"
+              class="w-full bg-dragons-dark border border-dragons-border rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-dragons-red"
+            />
+            <button type="button" id="toggleKeyEye" class="absolute right-3 top-2 text-slate-400 hover:text-slate-200">
+              <i class="fa-regular fa-eye text-xs"></i>
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-500 mt-1">傳入 Header <code>x-api-key</code>，僅暫存於您的瀏覽器本地空間。</p>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Source ID (PDF 向量知識庫 ID)</label>
+          <input
+            type="text"
+            id="inputSourceId"
+            class="w-full bg-dragons-dark border border-dragons-border rounded-xl px-3 py-2 text-xs font-mono text-amber-300 focus:outline-none focus:border-dragons-red"
+          />
+          <p class="text-[10px] text-slate-500 mt-1">目前已設定：<code>cha_AAuyTuEJIvpt0xbrDACLf</code></p>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-xl bg-dragons-dark border border-dragons-border">
+          <div>
+            <div class="font-medium text-slate-200">引用頁碼標註 (Reference Sources)</div>
+            <div class="text-[10px] text-slate-400">於回答中附帶 PDF 引用頁標記如 [P1]、[P3]</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="inputRefSources" class="sr-only peer" checked>
+            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-dragons-red"></div>
+          </label>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">球員人設前綴 Prompt (Persona Injection)</label>
+          <textarea
+            id="inputPersona"
+            rows="3"
+            class="w-full bg-dragons-dark border border-dragons-border rounded-xl p-2.5 text-xs text-slate-300 focus:outline-none focus:border-dragons-red"
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="inputVoice" class="block font-semibold text-slate-300 mb-1">語音角色</label>
+            <select id="inputVoice" class="w-full bg-dragons-dark border border-dragons-border rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-dragons-red">
+              <option value="male">中文男聲（固定）</option>
+            </select>
+            <p id="voiceAvailabilityText" class="text-[10px] text-slate-500 mt-1">正在偵測裝置是否有台灣繁中男聲。</p>
+          </div>
+          <div>
+            <label for="inputSpeechRate" class="block font-semibold text-slate-300 mb-1">語速：<span id="speechRateValue">0.95</span></label>
+            <input id="inputSpeechRate" type="range" min="0.75" max="1.15" step="0.05" value="0.95" class="w-full accent-dragons-red">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-xl bg-dragons-dark border border-dragons-border">
+          <div>
+            <div class="font-medium text-slate-200">自動朗讀回覆</div>
+            <div class="text-[10px] text-slate-400">回覆完成後使用男生語氣朗讀；可隨時停止</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="inputAutoSpeak" class="sr-only peer">
+            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-dragons-red"></div>
+          </label>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2">
+        <button id="cancelConfigBtn" class="px-4 py-2 rounded-xl bg-dragons-dark hover:bg-dragons-surfaceHover text-slate-300 text-xs font-medium transition">
+          取消
+        </button>
+        <button id="saveConfigBtn" class="px-4 py-2 rounded-xl bg-dragons-red hover:bg-dragons-crimson text-white text-xs font-bold transition shadow-md">
+          儲存並套用
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 頁碼點擊快速預覽彈窗 ==================== -->
+  <div id="citationModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-dragons-surface border border-dragons-border rounded-xl max-w-sm w-full p-4 shadow-2xl text-center space-y-3">
+      <div class="w-10 h-10 rounded-full bg-dragons-red/20 text-dragons-red mx-auto flex items-center justify-center text-lg">
+        <i class="fa-regular fa-file-lines"></i>
+      </div>
+      <div>
+        <h4 id="citationPageTitle" class="text-sm font-bold text-white">引用自知識庫 第 1 頁</h4>
+        <p class="text-xs text-slate-400 mt-1">此段回答直接檢索自您上傳的張政禹球員文檔，確保數據真實且未經捏造。</p>
+      </div>
+      <button onclick="closeCitationModal()" class="w-full py-1.5 bg-dragons-dark hover:bg-dragons-surfaceHover border border-dragons-border rounded-lg text-xs font-medium text-slate-200">
+        我知道了
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast 訊息通知 -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-16 opacity-0 transition-all duration-300 bg-dragons-surface border border-dragons-border text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+    <span id="toastMsg">通知訊息</span>
+  </div>
+
+  <!-- ==================== JS 業務邏輯與 API 串接 ==================== -->
+  <script>
+    // 預設填入使用者提供的 Key 與 Source ID
+    const PRESET_API_KEY = "sec_sqm7JrzuT00O3JErTncyvVPJj48yiSqX";
+    const PRESET_SOURCE_ID = "cha_AAuyTuEJIvpt0xbrDACLf";
+    const DEFAULT_PERSONA = "【重要角色指令：你現在以中華職棒味全龍隊游擊手張政禹的公開形象與球員視角回答（背號 25 號，2024 世界12強冠軍中華隊球員）。味全龍在 2026 年奪得中職年度總冠軍，台灣大賽曾取得 3：0 聽牌優勢，兄弟追回兩場後，龍隊於第六戰封王。請用自然、親切、像朋友聊棒球的第一人稱口吻；適度使用熱血、幽默或感性語氣，不要模板化、不必每句都喊口號，也不要說得像正式新聞稿。回答時優先嚴格根據 PDF 文件與已載入的官方賽事知識；若文件未提及細節，坦白說『這個部分我手邊的資料剛好沒有耶！』。嚴禁瞎編攻守數據、球員細節或私人對話。】";
+
+    // 系統狀態
+    const state = {
+      apiKey: localStorage.getItem('cp_api_key') || PRESET_API_KEY,
+      sourceId: localStorage.getItem('cp_source_id') || PRESET_SOURCE_ID,
+      refSources: localStorage.getItem('cp_ref_sources') !== 'false',
+      persona: localStorage.getItem('cp_persona') || DEFAULT_PERSONA,
+      messages: [] // 維持 6 則以內
+    };
+
+    // DOM 元素
+    const messagesContainer = document.getElementById('messagesContainer');
+    const chatScrollArea = document.getElementById('chatScrollArea');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const sidebarSourceIdDisplay = document.getElementById('sidebarSourceIdDisplay');
+
+    // 側邊欄控制
+    const playerSidebar = document.getElementById('playerSidebar');
+    const toggleSidebarMobile = document.getElementById('toggleSidebarMobile');
+    const closeSidebarMobile = document.getElementById('closeSidebarMobile');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+    // Modal 控制
+    const configModal = document.getElementById('configModal');
+    const openConfigBtn = document.getElementById('openConfigBtn');
+    const closeConfigBtn = document.getElementById('closeConfigBtn');
+    const cancelConfigBtn = document.getElementById('cancelConfigBtn');
+    const saveConfigBtn = document.getElementById('saveConfigBtn');
+    const inputApiKey = document.getElementById('inputApiKey');
+    const inputSourceId = document.getElementById('inputSourceId');
+    const inputRefSources = document.getElementById('inputRefSources');
+    const inputPersona = document.getElementById('inputPersona');
+    const inputVoice = document.getElementById('inputVoice');
+    const inputSpeechRate = document.getElementById('inputSpeechRate');
+    const inputAutoSpeak = document.getElementById('inputAutoSpeak');
+    const toggleKeyEye = document.getElementById('toggleKeyEye');
+    const clearChatBtn = document.getElementById('clearChatBtn');
+    const voiceInputBtn = document.getElementById('voiceInputBtn');
+
+    // 初始化設定
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!state.persona.includes('2026') || state.persona.includes('奧援') || !state.persona.includes('自然')) {
+        state.persona = DEFAULT_PERSONA;
+        localStorage.setItem('cp_persona', state.persona);
+      }
+      sidebarSourceIdDisplay.innerText = state.sourceId;
+      syncConfigForm();
+      setupVoiceInterface();
+      detectTaiwanMaleVoice();
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.addEventListener('voiceschanged', detectTaiwanMaleVoice);
+      }
+
+      // 自動調整 Textarea 高度
+      chatInput.addEventListener('input', () => {
+        chatInput.style.height = 'auto';
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
+      });
+
+      inputSpeechRate.addEventListener('input', () => {
+        document.getElementById('speechRateValue').textContent = inputSpeechRate.value;
+      });
+
+      // Enter 送出 (Shift + Enter 換行)
+      chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          handleSubmit();
+        }
+      });
+    });
+
+    // 表單送出
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleSubmit();
+    });
+
+    // 快捷問題按鈕
+    window.sendQuickPrompt = function(promptText) {
+      chatInput.value = promptText;
+      handleSubmit();
+    };
+
+    // 處理送出
+    async function handleSubmit() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      if (!state.apiKey || !state.sourceId) {
+        showToast('請先完成 API Key 與 Source ID 設定！', 'error');
+        openConfig();
+        return;
+      }
+
+      appendMessage('user', text);
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+
+      setLoading(true);
+
+      try {
+        await callChatPdf(text);
+      } catch (err) {
+        console.error(err);
+        appendMessage('bot', `⚠️ **連線狀況回報**：\n\n呼叫 ChatPDF API 時發生錯誤：\`${err.message}\`。\n請確認您的 API Key 額度是否充足，以及 Source ID（\`${state.sourceId}\`）是否正確有效！`);
+        showToast('呼叫失敗: ' + err.message, 'error');
+      } finally {
+        setLoading(false);
+        chatInput.focus();
+      }
+    }
+
+    // 發送請求至 ChatPDF API
+    async function callChatPdf(question) {
+      const endpoint = 'https://api.chatpdf.com/v1/chats/message';
+
+      const promptPayload = `${state.persona}\n\n球迷提問：${question}`;
+
+      const outgoingMessages = [
+        ...state.messages.slice(-4),
+        { role: 'user', content: promptPayload }
+      ];
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'x-api-key': state.apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sourceId: state.sourceId,
+          referenceSources: state.refSources,
+          messages: outgoingMessages
+        })
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.message || `HTTP ${res.status}: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      const botResponse = data.content || "（知識庫暫無文字內容回傳）";
+      const references = data.references || [];
+
+      // 更新內部對話歷史（維持最多 6 筆）
+      state.messages.push({ role: 'user', content: question });
+      state.messages.push({ role: 'assistant', content: botResponse });
+      if (state.messages.length > 6) {
+        state.messages = state.messages.slice(-6);
+      }
+
+      appendMessage('bot', botResponse, references);
+      if (localStorage.getItem('voice_auto_speak') === 'true') {
+        window.speakTextByVoice(botResponse);
+      }
+    }
+
+    // 渲染訊息泡泡
+    function appendMessage(sender, content, references = []) {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-bubble-enter';
+
+      if (sender === 'user') {
+        wrap.className += ' flex justify-end';
+        wrap.innerHTML = `
+          <div class="max-w-[85%] md:max-w-[75%] bg-gradient-to-r from-dragons-red to-dragons-crimson text-white px-4 py-3 rounded-2xl rounded-tr-sm shadow-md text-sm leading-relaxed whitespace-pre-wrap">
+            ${escapeHtml(content)}
+          </div>
+        `;
+      } else {
+        wrap.className += ' flex items-start space-x-3';
+
+        let parsedHtml = marked.parse(content);
+
+        // 將 [P1] 替換成可點擊的專屬徽章
+        parsedHtml = parsedHtml.replace(/\[P(\d+)\]/g, (match, p1) => {
+          return `<button onclick="openCitationModal(${p1})" class="inline-flex items-center gap-1 mx-1 px-1.5 py-0.5 text-[11px] font-mono bg-dragons-red/20 text-red-300 border border-dragons-red/50 rounded hover:bg-dragons-red hover:text-white transition" title="檢視引證頁碼"><i class="fa-regular fa-file-pdf"></i> P.${p1}</button>`;
+        });
+
+        // 底部引用頁碼條
+        let refSectionHtml = '';
+        if (references && references.length > 0) {
+          const pageBadges = references.map(r => `
+            <button onclick="openCitationModal(${r.pageNumber})" class="bg-dragons-dark hover:bg-dragons-surfaceHover border border-dragons-border px-2 py-0.5 rounded text-[11px] font-mono text-amber-300 transition">
+              P.${r.pageNumber}
+            </button>
+          `).join(' ');
+
+          refSectionHtml = `
+            <div class="mt-3 pt-2.5 border-t border-dragons-border/60 flex items-center gap-2 flex-wrap text-xs text-slate-400">
+              <span class="text-dragons-gold font-medium flex items-center gap-1">
+                <i class="fa-solid fa-book-bookmark text-[11px]"></i> 知識庫引用來源：
+              </span>
+              ${pageBadges}
+            </div>
+          `;
+        }
+
+        wrap.innerHTML = `
+          <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow mt-0.5 border border-dragons-gold">
+            <img src="張.jpg" alt="張政禹" class="w-full h-full object-cover object-[center_18%]">
+          </div>
+          <div class="max-w-[85%] md:max-w-[80%] bg-dragons-surface border border-dragons-border text-slate-200 px-4 py-3 rounded-2xl rounded-tl-sm shadow-lg text-sm leading-relaxed">
+            <div class="flex items-center justify-between mb-1 pb-1 border-b border-dragons-border/40 text-[11px]">
+              <span class="font-bold text-dragons-gold">味全龍 #25 張政禹</span>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="speakBotResponse(this)" class="h-7 px-2 rounded-lg border border-dragons-border bg-dragons-dark text-slate-300 hover:text-dragons-gold hover:border-dragons-gold/70 transition" aria-label="朗讀這則回覆" title="朗讀回覆">
+                  <i class="fa-solid fa-volume-high text-[10px]"></i>
+                </button>
+                <span class="text-[10px] text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-check"></i> RAG 檢索完成</span>
+              </div>
+            </div>
+            <div class="markdown-body text-slate-200">${parsedHtml}</div>
+            ${refSectionHtml}
+          </div>
+        `;
+      }
+
+      messagesContainer.appendChild(wrap);
+      chatScrollArea.scrollTop = chatScrollArea.scrollHeight;
+    }
+
+    // 語音輸入與語音朗讀
+    function announceVoice(message) {
+      const status = document.getElementById('voiceStatus');
+      if (status) status.textContent = message;
+    }
+
+    function updateVoiceAvailability(message) {
+      const availability = document.getElementById('voiceAvailabilityText');
+      if (availability) availability.textContent = message;
+    }
+
+    function detectTaiwanMaleVoice() {
+      if (!('speechSynthesis' in window)) {
+        updateVoiceAvailability('此瀏覽器不支援語音朗讀');
+        return;
+      }
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length === 0) {
+        setTimeout(detectTaiwanMaleVoice, 500);
+        return;
+      }
+
+      const taiwanVoices = voices.filter(voice =>
+        /^zh[-_]TW$/i.test(String(voice.lang).replace(/\s/g, ''))
+      );
+      const femaleHints = /female|woman|xiaoxiao|曉|晓|女|huihui|xiaoyi|xiaoran|lili|mei|hanhan|hsiao|peiyun|yating/i;
+      const maleHints = /male|man|boy|zhiyu|zhiwei|zhong|男|達|达|yunjian|yunxi/i;
+      const candidates = taiwanVoices.filter(voice => {
+        const identity = `${voice.name} ${voice.voiceURI}`.toLowerCase();
+        return maleHints.test(identity) && !femaleHints.test(identity);
+      });
+
+      if (candidates.length > 0) {
+        updateVoiceAvailability(`已偵測到台灣男聲：${candidates[0].name}`);
+      } else {
+        updateVoiceAvailability('目前無可確認的台灣繁中男聲，朗讀已停用');
+      }
+    }
+
+    function setupVoiceInterface() {
+      if (!voiceInputBtn) return;
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        voiceInputBtn.disabled = true;
+        voiceInputBtn.title = '此瀏覽器不支援語音輸入';
+        voiceInputBtn.setAttribute('aria-label', '此瀏覽器不支援語音輸入');
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'zh-TW';
+      recognition.interimResults = true;
+      recognition.continuous = false;
+
+      let voiceBaseText = '';
+
+      voiceInputBtn.addEventListener('click', () => {
+        if (voiceInputBtn.getAttribute('aria-pressed') === 'true') {
+          recognition.stop();
+          return;
+        }
+        voiceBaseText = chatInput.value.trim();
+        recognition.start();
+      });
+
+      recognition.addEventListener('start', () => {
+        voiceInputBtn.setAttribute('aria-pressed', 'true');
+        voiceInputBtn.classList.add('text-dragons-gold', 'border-dragons-gold');
+        voiceInputBtn.innerHTML = '<i class="fa-solid fa-stop text-sm"></i>';
+        announceVoice('語音辨識已開始，請說話');
+        showToast('請開始說出問題', 'info');
+      });
+
+      recognition.addEventListener('result', (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        chatInput.value = voiceBaseText ? `${voiceBaseText} ${transcript}` : transcript;
+        chatInput.dispatchEvent(new Event('input'));
+      });
+
+      recognition.addEventListener('end', () => {
+        voiceInputBtn.setAttribute('aria-pressed', 'false');
+        voiceInputBtn.classList.remove('text-dragons-gold', 'border-dragons-gold');
+        voiceInputBtn.innerHTML = '<i class="fa-solid fa-microphone text-sm"></i>';
+        announceVoice('語音辨識已結束');
+      });
+
+      recognition.addEventListener('error', (event) => {
+        const message = event.error === 'not-allowed'
+          ? '麥克風權限遭拒絕，請允許後再試'
+          : `語音辨識失敗：${event.error}`;
+        announceVoice(message);
+        showToast(message, 'error');
+      });
+    }
+
+    window.speakBotResponse = function(button) {
+      if (!('speechSynthesis' in window)) {
+        showToast('此瀏覽器不支援語音朗讀', 'error');
+        return;
+      }
+
+      const bubble = button.closest('.bg-dragons-surface');
+      const textNode = bubble ? bubble.querySelector('.markdown-body') : null;
+      const text = textNode ? textNode.textContent.trim() : '';
+      if (!text) return;
+      window.speakTextByVoice(text);
+    };
+
+    window.speakTextByVoice = function(text) {
+      if (!text || !('speechSynthesis' in window)) return;
+
+      window.speechSynthesis.cancel();
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length === 0) {
+        window.speechSynthesis.getVoices();
+        setTimeout(() => window.speakTextByVoice(text), 500);
+        return;
+      }
+
+      const taiwanVoices = voices.filter(voice =>
+        /^zh[-_]TW$/i.test(String(voice.lang).replace(/\s/g, ''))
+      );
+      const confirmedTaiwanMale = /zhiyu|zhiwei|zhong|male|man|boy|男|達|达|yunjian|yunxi/i;
+      const knownNonTaiwanMale = /microsoft.*zh[-_]?CN|google.*zh[-_]?CN|zh[-_]?CN/i;
+      const knownFemale = /female|woman|xiaoxiao|曉|晓|女|huihui|xiaoyi|xiaoran|lili|mei|hanhan|hsiao|peiyun|yating/i;
+
+      const selectedVoice = taiwanVoices.find(voice => {
+        const identity = `${voice.name} ${voice.voiceURI}`.toLowerCase();
+        return confirmedTaiwanMale.test(identity)
+          && !knownFemale.test(identity)
+          && !knownNonTaiwanMale.test(identity);
+      }) || null;
+
+      if (!selectedVoice) {
+        const message = '沒有偵測到可確認是台灣腔的繁中男聲，已取消朗讀；瀏覽器原生語音無法保證張政禹本人腔調';
+        announceVoice(message);
+        showToast(message, 'error');
+        updateVoiceAvailability('目前無可確認的台灣繁中男聲，朗讀已停用');
+        return;
+      }
+
+      localStorage.setItem('voice_role', 'male');
+
+      const naturalText = text
+        .replace(/https?:\/\/\S+/g, '')
+        .replace(/[#*_~`]/g, '')
+        .replace(/([。！？])\s*/g, '$1 ')
+        .replace(/🔥|🏆|🐉|💪|⚡|❤️|👋/g, '');
+
+      const utterance = new SpeechSynthesisUtterance(naturalText);
+      utterance.lang = 'zh-TW';
+      utterance.voice = selectedVoice;
+      utterance.rate = Math.min(Number(localStorage.getItem('voice_rate') || '0.90'), 0.95);
+      utterance.pitch = 0.82;
+      utterance.onstart = () => announceVoice(`開始使用台灣繁中男聲朗讀：${selectedVoice.name}`);
+      utterance.onend = () => announceVoice('朗讀結束');
+      utterance.onerror = () => announceVoice('語音朗讀失敗');
+      window.speechSynthesis.speak(utterance);
+    };
+
+    // 張政禹球星台詞庫與互動動態
+    const playerQuotes = [
+      "只要撲下去，球就是我們的！🔥",
+      "第11指名又怎樣？只要能站上一軍先發，我就拼命到底！💪",
+      "穿上味全龍客場這身紅戰袍，每次出賽都是全力以赴！🐉",
+      "2024 世界 12 強奪冠那份榮耀，是全台灣球迷一起拿下的！🏆",
+      "防守第一步要先啟動，看到球打出來就是不顧一切撲下去！⚡",
+      "龍迷的吶喊就是我們在場上最大的動力！謝謝大家支持！❤️"
+    ];
+
+    window.interactWithPlayer = function() {
+      const bubbleText = document.getElementById('playerBubbleText');
+      const randomLine = playerQuotes[Math.floor(Math.random() * playerQuotes.length)];
+      bubbleText.innerText = randomLine;
+      window.speakTextByVoice(randomLine);
+
+      const playerPhoto = document.querySelector('.real-player-photo');
+      if (playerPhoto) {
+        playerPhoto.classList.add('scale-[1.08]');
+        setTimeout(() => playerPhoto.classList.remove('scale-[1.08]'), 900);
+      }
+    };
+
+    // 載入狀態切換
+    function setLoading(isLoading) {
+      const bubbleText = document.getElementById('playerBubbleText');
+      const playerPhoto = document.querySelector('.real-player-photo');
+
+      if (isLoading) {
+        typingIndicator.classList.remove('hidden');
+        typingIndicator.classList.add('flex');
+        sendBtn.disabled = true;
+        if (bubbleText) bubbleText.innerText = '正在幫你翻查 PDF 知識庫，準備接球囉！⚾';
+        if (playerPhoto) playerPhoto.classList.add('brightness-[1.08]');
+      } else {
+        typingIndicator.classList.add('hidden');
+        typingIndicator.classList.remove('flex');
+        sendBtn.disabled = false;
+        if (bubbleText) bubbleText.innerText = '回答完成了！還有什麼想聊的嗎？😊';
+        if (playerPhoto) playerPhoto.classList.remove('brightness-[1.08]');
+      }
+      chatScrollArea.scrollTop = chatScrollArea.scrollHeight;
+    }
+
+    // 清空歷史
+    clearChatBtn.addEventListener('click', () => {
+      messagesContainer.innerHTML = '';
+      state.messages = [];
+      showToast('對話已重新初始化', 'info');
+    });
+
+    // Modal 與 Form 控制
+    function syncConfigForm() {
+      inputApiKey.value = state.apiKey;
+      inputSourceId.value = state.sourceId;
+      inputRefSources.checked = state.refSources;
+      inputPersona.value = state.persona;
+      inputVoice.value = 'male';
+      localStorage.setItem('voice_role', 'male');
+      inputSpeechRate.value = localStorage.getItem('voice_rate') || '0.95';
+      document.getElementById('speechRateValue').textContent = inputSpeechRate.value;
+      inputAutoSpeak.checked = localStorage.getItem('voice_auto_speak') === 'true';
+    }
+
+    function openConfig() {
+      syncConfigForm();
+      configModal.classList.remove('hidden');
+    }
+    function closeConfig() {
+      configModal.classList.add('hidden');
+    }
+
+    openConfigBtn.addEventListener('click', openConfig);
+    closeConfigBtn.addEventListener('click', closeConfig);
+    cancelConfigBtn.addEventListener('click', closeConfig);
+
+    saveConfigBtn.addEventListener('click', () => {
+      state.apiKey = inputApiKey.value.trim();
+      state.sourceId = inputSourceId.value.trim();
+      state.refSources = inputRefSources.checked;
+      state.persona = inputPersona.value.trim() || DEFAULT_PERSONA;
+
+      localStorage.setItem('cp_api_key', state.apiKey);
+      localStorage.setItem('cp_source_id', state.sourceId);
+      localStorage.setItem('cp_ref_sources', state.refSources);
+      localStorage.setItem('cp_persona', state.persona);
+      localStorage.setItem('voice_role', inputVoice.value);
+      localStorage.setItem('voice_rate', inputSpeechRate.value);
+      localStorage.setItem('voice_auto_speak', inputAutoSpeak.checked);
+
+      sidebarSourceIdDisplay.innerText = state.sourceId;
+      closeConfig();
+      showToast('設定已成功儲存並生效！', 'success');
+    });
+
+    // API Key 眼睛開關
+    toggleKeyEye.addEventListener('click', () => {
+      const isPwd = inputApiKey.type === 'password';
+      inputApiKey.type = isPwd ? 'text' : 'password';
+      toggleKeyEye.innerHTML = isPwd ? '<i class="fa-regular fa-eye-slash text-xs"></i>' : '<i class="fa-regular fa-eye text-xs"></i>';
+    });
+
+    // 側邊欄手機展開/關閉
+    toggleSidebarMobile.addEventListener('click', () => {
+      playerSidebar.classList.remove('-translate-x-full');
+      sidebarBackdrop.classList.remove('hidden');
+      toggleSidebarMobile.setAttribute('aria-expanded', 'true');
+    });
+    const hideSidebar = () => {
+      playerSidebar.classList.add('-translate-x-full');
+      sidebarBackdrop.classList.add('hidden');
+      toggleSidebarMobile.setAttribute('aria-expanded', 'false');
+    };
+    closeSidebarMobile.addEventListener('click', hideSidebar);
+    sidebarBackdrop.addEventListener('click', hideSidebar);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      closeConfig();
+      closeCitationModal();
+      hideSidebar();
+    });
+
+    // Citation 引用彈窗
+    window.openCitationModal = function(pageNum) {
+      document.getElementById('citationPageTitle').innerText = `引用自知識庫 PDF 第 ${pageNum} 頁`;
+      document.getElementById('citationModal').classList.remove('hidden');
+    };
+    window.closeCitationModal = function() {
+      document.getElementById('citationModal').classList.add('hidden');
+    };
+
+    // Toast 通知
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      const toastIcon = document.getElementById('toastIcon');
+
+      toastMsg.innerText = msg;
+      if (type === 'error') {
+        toastIcon.className = 'fa-solid fa-circle-exclamation text-rose-500 text-sm';
+      } else if (type === 'info') {
+        toastIcon.className = 'fa-solid fa-circle-info text-sky-400 text-sm';
+      } else {
+        toastIcon.className = 'fa-solid fa-circle-check text-emerald-400 text-sm';
+      }
+
+      toast.classList.remove('translate-y-16', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-16', 'opacity-0');
+      }, 2600);
+    }
+
+    // HTML 跳脫防 XSS
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag] || tag));
+    }
+  </script>
+</body>
+</html>
